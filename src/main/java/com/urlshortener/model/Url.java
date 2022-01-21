@@ -9,7 +9,13 @@ public class Url {
     private long id;
     private String url;
     private String shortUrl;
-    private Date validUntil;
+    private Date expiresDate;
+    private boolean timeLess = true;
     private long numberOfVisits;
     private long uniqueVisits;
+
+    public void setExpiresDate(Date date) {
+        expiresDate = date;
+        timeLess = date == null;
+    }
 }
