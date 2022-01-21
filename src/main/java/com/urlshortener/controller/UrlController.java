@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping(path = "/api/v1")
@@ -16,7 +18,7 @@ public class UrlController {
     private final UrlService urlService;
 
     @PostMapping()
-    public ResponseEntity<Url> createNewShortUrl(@RequestBody final NewUrlDto newUrlDto) {
+    public ResponseEntity<Url> createNewShortUrl(@RequestBody @Valid final NewUrlDto newUrlDto) {
         return ResponseEntity.ok(urlService.createUrl(newUrlDto));
     }
 
