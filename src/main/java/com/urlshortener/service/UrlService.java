@@ -6,6 +6,7 @@ import com.urlshortener.exception.EntityNotDeletedException;
 import com.urlshortener.exception.EntityNotFoundException;
 import com.urlshortener.exception.EntityNotSavedException;
 import com.urlshortener.model.Url;
+import com.urlshortener.service.mapper.UrlMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UrlService {
     private final UrlDao urlDao;
-    private final UrlConverter urlConverter;
+    private final UrlMapper urlMapper;
 
     public String getOriginalUrl(String shortUrl) {
         Url url = urlDao.getByShortUrl(shortUrl).orElseThrow(() -> new EntityNotFoundException(
@@ -41,14 +42,7 @@ public class UrlService {
             }
         }
 
-        Url url = new Url();
-        url.setId(urlDao.getNextId());
-        url.setUrl(newUrlDto.getUrl());
-        url.setShortUrl(urlConverter.encode(url.getId()));
-        if (!newUrlDto.isTimeLess()) {
-            url.setExpiresDate(newUrlDto.getExpiresDate());
-        }
-
+        Url url = urlMapper.createFrom(newUrlDto);
         save(url);
         return url;
     }
