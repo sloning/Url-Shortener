@@ -45,7 +45,7 @@ public class UrlService {
         url.setId(urlDao.getNextId());
         url.setUrl(newUrlDto.getUrl());
         url.setShortUrl(urlConverter.encode(url.getId()));
-        if (newUrlDto.isTimeLess()) {
+        if (!newUrlDto.isTimeLess()) {
             url.setExpiresDate(newUrlDto.getExpiresDate());
         }
 
