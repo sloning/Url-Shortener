@@ -10,5 +10,5 @@ public class NewUrlDto {
     @URL(message = "Invalid url")
     private String url;
     private boolean timeLess = true;
-    private Date validUntil;
+    private Date expiresDate;
 }

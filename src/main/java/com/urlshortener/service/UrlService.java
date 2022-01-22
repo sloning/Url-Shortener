@@ -9,6 +9,7 @@ import com.urlshortener.model.Url;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,6 +28,10 @@ public class UrlService {
         return url.getUrl();
     }
 
+    public List<Url> getAll() {
+        return urlDao.getAll();
+    }
+
     public Url createUrl(NewUrlDto newUrlDto) {
         Optional<Url> optionalUrl = urlDao.getByFullUrl(newUrlDto.getUrl());
         if (optionalUrl.isPresent()) {
@@ -41,7 +46,7 @@ public class UrlService {
         url.setUrl(newUrlDto.getUrl());
         url.setShortUrl(urlConverter.encode(url.getId()));
         if (newUrlDto.isTimeLess()) {
-            url.setExpiresDate(newUrlDto.getValidUntil());
+            url.setExpiresDate(newUrlDto.getExpiresDate());
         }
 
         save(url);

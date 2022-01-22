@@ -10,10 +10,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping(path = "/api/v1")
+@RequestMapping(path = "/api/v1/url")
 public class UrlController {
     private final UrlService urlService;
 
@@ -28,13 +29,18 @@ public class UrlController {
         return "redirect:" + urlService.getOriginalUrl(shortUrl);
     }
 
+    @GetMapping()
+    public ResponseEntity<List<Url>> getAll() {
+        return ResponseEntity.ok(urlService.getAll());
+    }
+
     @DeleteMapping()
     public ResponseEntity<Void> deleteUrl(@RequestBody Long urlId) {
         urlService.delete(urlId);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/expiredUrls")
+    @DeleteMapping("/expired")
     public ResponseEntity<Integer> deleteExpiredUrls() {
         return ResponseEntity.ok(urlService.deleteExpiredUrls());
     }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -32,6 +33,12 @@ public class UrlDao {
         String sql = "select nextval('url_id_seq')";
 
         return jdbcTemplate.queryForObject(sql, Long.class);
+    }
+
+    public List<Url> getAll() {
+        String sql = "select * from url";
+
+        return jdbcTemplate.query(sql, this::mapRowToUrl);
     }
 
     public int save(Url url) {
