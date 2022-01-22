@@ -7,6 +7,7 @@ import com.urlshortener.exception.EntityNotFoundException;
 import com.urlshortener.exception.EntityNotSavedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,5 +43,11 @@ public class ExceptionController {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(Exception ex) {
         return new ResponseEntity<>(new ErrorResponse(400, 5, ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(Exception ex) {
+        return new ResponseEntity<>(new ErrorResponse(400, 6, ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }
