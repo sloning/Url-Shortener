@@ -43,7 +43,6 @@ public class AuthService {
 
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
-        response.put("userId", user.getId().toString());
         return response;
     }
 }
