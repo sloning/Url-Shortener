@@ -37,6 +37,6 @@ Swagger: [url.vlados.me/swagger-ui/index.html](http://url.vlados.me/swagger-ui/i
 
 ```
 ./gradlew bootJar
-docker build -t url_shortener:latest .
+docker build -t url:latest .
 docker-compose up -d
 ```

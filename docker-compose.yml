@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  url_postgres:
+    container_name: url_postgres
+    image: postgres
+    restart: always
+    network_mode: bridge
+    ports:
+      - "5433:5432"
+    expose:
+      - 5433
+    environment:
+      POSTGRES_DB: url_shortener
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $db_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 1m
+      timeout: 10s
+      retries: 2
+
+  url:
+    container_name: url
+    image: url:latest
+    restart: always
+    network_mode: bridge
+    ports:
+      - "8081:8080"
+    depends_on:
+      - url_postgres
+    links:
+      - url_postgres
+    environment:
+      db_host: $db_host
+      db_username: postgres
+      db_password: $db_password
+      SECURITY_SECRET: $SECURITY_SECRET
+
+volumes:
+  postgres_data:
+    driver: local
