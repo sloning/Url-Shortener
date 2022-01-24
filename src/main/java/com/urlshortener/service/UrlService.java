@@ -1,73 +1,46 @@
 package com.urlshortener.service;
 
 import com.urlshortener.dao.UrlDao;
-import com.urlshortener.dao.VisitorDao;
-import com.urlshortener.dto.NewUrlDto;
+import com.urlshortener.dto.mapper.UrlMapper;
+import com.urlshortener.dto.model.UrlDto;
 import com.urlshortener.exception.EntityNotDeletedException;
 import com.urlshortener.exception.EntityNotFoundException;
 import com.urlshortener.exception.EntityNotSavedException;
 import com.urlshortener.model.Url;
-import com.urlshortener.model.Visitor;
-import com.urlshortener.service.mapper.UrlMapper;
-import com.urlshortener.util.HttpUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UrlService {
     private final UrlDao urlDao;
-    private final VisitorDao visitorDao;
     private final UrlMapper urlMapper;
+    private final StatisticsService statisticsService;
 
-    public String getOriginalUrl(String shortUrl, HttpServletRequest httpServletRequest) {
+    public String getOriginalUrl(String shortUrl, HttpServletRequest request) {
         Url url = urlDao.getByShortUrl(shortUrl).orElseThrow(() -> new EntityNotFoundException(
                 String.format("Entity with url: %s was not found", shortUrl)));
 
-        updateCounters(url, httpServletRequest);
+        statisticsService.updateCounters(url, request);
 
         return url.getUrl();
     }
 
-    private void updateCounters(Url url, HttpServletRequest httpServletRequest) {
-        Optional<Visitor> optionalVisitor = visitorDao.getByUrlId(url.getId());
-
-        if (optionalVisitor.isEmpty()) {
-            Visitor newVisitor = new Visitor();
-
-            String ipAddress = HttpUtils.getRequestIp(httpServletRequest);
-            newVisitor.setIpAddress(ipAddress);
-            newVisitor.setUrlId(url.getId());
-            visitorDao.save(newVisitor);
-
-            url.setUniqueVisits(url.getUniqueVisits() + 1);
-        }
-
-        url.setNumberOfVisits(url.getNumberOfVisits() + 1);
-
-        urlDao.update(url);
-    }
-
-    public List<Url> getAll() {
-        return urlDao.getAll();
-    }
-
-    public Url createUrl(NewUrlDto newUrlDto) {
-        Optional<Url> optionalUrl = urlDao.getByFullUrl(newUrlDto.getUrl());
+    public UrlDto createUrl(UrlDto urlDto) {
+        Optional<Url> optionalUrl = urlDao.getByFullUrl(urlDto.getUrl());
         if (optionalUrl.isPresent()) {
             Url url = optionalUrl.get();
-            if (url.isTimeLess() && newUrlDto.isTimeLess()) {
-                return url;
+            if (url.isTimeLess() && urlDto.isTimeLess()) {
+                return urlMapper.createFrom(url);
             }
         }
 
-        Url url = urlMapper.createFrom(newUrlDto);
+        Url url = urlMapper.createFrom(urlDto);
         save(url);
-        return url;
+        return urlMapper.createFrom(url);
     }
 
     public void delete(Long id) {

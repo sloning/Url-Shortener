@@ -1,6 +1,6 @@
 package com.urlshortener.service;
 
-import com.urlshortener.dto.UserDto;
+import com.urlshortener.dto.model.UserDto;
 import com.urlshortener.exception.EntityAlreadyExistsException;
 import com.urlshortener.model.User;
 import com.urlshortener.security.jwt.JwtTokenProvider;
