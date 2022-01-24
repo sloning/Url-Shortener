@@ -1,48 +1,44 @@
 package com.urlshortener.controller;
 
-import com.urlshortener.dto.NewUrlDto;
-import com.urlshortener.model.Url;
+import com.urlshortener.dto.model.UrlDto;
+import com.urlshortener.dto.response.Response;
 import com.urlshortener.service.UrlService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.List;
+import java.io.IOException;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/api/v1/url")
 public class UrlController {
     private final UrlService urlService;
 
-    @PostMapping()
-    public ResponseEntity<Url> createNewShortUrl(@RequestBody @Valid final NewUrlDto newUrlDto) {
-        return ResponseEntity.ok(urlService.createUrl(newUrlDto));
-    }
-
     @GetMapping("/{shortUrl}")
     @Cacheable(value = "urls", key = "#shortUrl", sync = true)
-    public String redirectToUrl(@PathVariable String shortUrl, HttpServletRequest httpServletRequest) {
-        return "redirect:" + urlService.getOriginalUrl(shortUrl, httpServletRequest);
+    public void redirectToUrl(@PathVariable String shortUrl,
+                              HttpServletRequest request,
+                              HttpServletResponse response) throws IOException {
+        response.sendRedirect(urlService.getOriginalUrl(shortUrl, request));
     }
 
-    @GetMapping()
-    public ResponseEntity<List<Url>> getAll() {
-        return ResponseEntity.ok(urlService.getAll());
+    @PostMapping()
+    public Response<UrlDto> createNewShortUrl(@RequestBody @Valid final UrlDto urlDto) {
+        return new Response<>(urlService.createUrl(urlDto));
     }
 
     @DeleteMapping()
-    public ResponseEntity<Void> deleteUrl(@RequestBody Long urlId) {
+    public Response<Void> deleteUrl(@RequestBody Long urlId) {
         urlService.delete(urlId);
-        return ResponseEntity.ok().build();
+        return new Response<>("Url was successfully deleted");
     }
 
     @DeleteMapping("/expired")
-    public ResponseEntity<Integer> deleteExpiredUrls() {
-        return ResponseEntity.ok(urlService.deleteExpiredUrls());
+    public Response<Void> deleteExpiredUrls() {
+        return new Response<>(urlService.deleteExpiredUrls() + " urls were successfully deleted");
     }
 }
