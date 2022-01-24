@@ -1,15 +1,19 @@
 package com.urlshortener.service;
 
 import com.urlshortener.dao.UrlDao;
+import com.urlshortener.dao.VisitorDao;
 import com.urlshortener.dto.NewUrlDto;
 import com.urlshortener.exception.EntityNotDeletedException;
 import com.urlshortener.exception.EntityNotFoundException;
 import com.urlshortener.exception.EntityNotSavedException;
 import com.urlshortener.model.Url;
+import com.urlshortener.model.Visitor;
 import com.urlshortener.service.mapper.UrlMapper;
+import com.urlshortener.util.HttpUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,16 +21,35 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UrlService {
     private final UrlDao urlDao;
+    private final VisitorDao visitorDao;
     private final UrlMapper urlMapper;
 
-    public String getOriginalUrl(String shortUrl) {
+    public String getOriginalUrl(String shortUrl, HttpServletRequest httpServletRequest) {
         Url url = urlDao.getByShortUrl(shortUrl).orElseThrow(() -> new EntityNotFoundException(
                 String.format("Entity with url: %s was not found", shortUrl)));
 
-        url.setNumberOfVisits(url.getNumberOfVisits() + 1);
-        urlDao.update(url);
+        updateCounters(url, httpServletRequest);
 
         return url.getUrl();
+    }
+
+    private void updateCounters(Url url, HttpServletRequest httpServletRequest) {
+        Optional<Visitor> optionalVisitor = visitorDao.getByUrlId(url.getId());
+
+        if (optionalVisitor.isEmpty()) {
+            Visitor newVisitor = new Visitor();
+
+            String ipAddress = HttpUtils.getRequestIp(httpServletRequest);
+            newVisitor.setIpAddress(ipAddress);
+            newVisitor.setUrlId(url.getId());
+            visitorDao.save(newVisitor);
+
+            url.setUniqueVisits(url.getUniqueVisits() + 1);
+        }
+
+        url.setNumberOfVisits(url.getNumberOfVisits() + 1);
+
+        urlDao.update(url);
     }
 
     public List<Url> getAll() {

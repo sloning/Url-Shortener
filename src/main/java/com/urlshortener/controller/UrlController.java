@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -25,8 +26,8 @@ public class UrlController {
 
     @GetMapping("/{shortUrl}")
     @Cacheable(value = "urls", key = "#shortUrl", sync = true)
-    public String redirectToUrl(@PathVariable String shortUrl) {
-        return "redirect:" + urlService.getOriginalUrl(shortUrl);
+    public String redirectToUrl(@PathVariable String shortUrl, HttpServletRequest httpServletRequest) {
+        return "redirect:" + urlService.getOriginalUrl(shortUrl, httpServletRequest);
     }
 
     @GetMapping()
