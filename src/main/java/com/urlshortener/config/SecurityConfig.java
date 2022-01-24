@@ -26,7 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         webSecurity
                 .ignoring()
                 .antMatchers("/api/*/auth/**")
-                .antMatchers(HttpMethod.GET, "/api/*/**");
+                .antMatchers(HttpMethod.GET, "/api/*/url");
     }
 
     @Override
@@ -45,6 +45,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE, "/api/**")
                 .hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST, "/api/**")
+                .hasRole("ADMIN")
+                .antMatchers("/api/*/statistics")
                 .hasRole("ADMIN")
                 .and()
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
