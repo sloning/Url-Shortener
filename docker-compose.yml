@@ -35,7 +35,7 @@ services:
     links:
       - url_postgres
     environment:
-      db_host: $db_host
+      db_host: $url_db_host
       db_username: postgres
       db_password: $db_password
       SECURITY_SECRET: $SECURITY_SECRET
