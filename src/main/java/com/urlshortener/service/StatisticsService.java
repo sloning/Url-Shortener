@@ -4,13 +4,11 @@ import com.urlshortener.dao.UrlDao;
 import com.urlshortener.dao.VisitorDao;
 import com.urlshortener.model.Url;
 import com.urlshortener.model.Visitor;
-import com.urlshortener.util.HttpUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,21 +21,23 @@ public class StatisticsService {
     }
 
     public void updateCounters(Url url, HttpServletRequest request) {
-        Optional<Visitor> optionalVisitor = visitorDao.getByUrlId(url.getId());
+        updateUniqueVisits(url, request);
+        url.setNumberOfVisits(url.getNumberOfVisits() + 1);
 
-        if (optionalVisitor.isEmpty()) {
+        urlDao.update(url);
+    }
+
+    private void updateUniqueVisits(Url url, HttpServletRequest request) {
+        String ipAddress = request.getRemoteAddr();
+        boolean isExists = visitorDao.existsByUrlIdAndIp(url.getId(), ipAddress);
+
+        if (!isExists) {
             Visitor newVisitor = new Visitor();
-
-            String ipAddress = HttpUtils.getRequestIp(request);
             newVisitor.setIpAddress(ipAddress);
             newVisitor.setUrlId(url.getId());
             visitorDao.save(newVisitor);
 
             url.setUniqueVisits(url.getUniqueVisits() + 1);
         }
-
-        url.setNumberOfVisits(url.getNumberOfVisits() + 1);
-
-        urlDao.update(url);
     }
 }
