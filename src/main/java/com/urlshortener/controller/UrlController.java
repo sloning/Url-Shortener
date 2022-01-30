@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -21,9 +20,8 @@ public class UrlController {
     @GetMapping("/{shortUrl}")
     @Cacheable(value = "urls", key = "#shortUrl", sync = true)
     public void redirectToUrl(@PathVariable String shortUrl,
-                              HttpServletRequest request,
                               HttpServletResponse response) throws IOException {
-        response.sendRedirect(urlService.getOriginalUrl(shortUrl, request));
+        response.sendRedirect(urlService.getOriginalUrl(shortUrl));
     }
 
     @PostMapping()

@@ -8,6 +8,7 @@ import com.urlshortener.util.HttpUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -16,19 +17,21 @@ import java.util.List;
 public class StatisticsService {
     private final UrlDao urlDao;
     private final VisitorDao visitorDao;
+    @Resource
+    private HttpServletRequest request;
 
     public List<Url> get() {
         return urlDao.getAll();
     }
 
-    public void updateCounters(Url url, HttpServletRequest request) {
-        updateUniqueVisits(url, request);
+    public void updateCounters(Url url) {
+        updateUniqueVisits(url);
         url.setNumberOfVisits(url.getNumberOfVisits() + 1);
 
         urlDao.update(url);
     }
 
-    private void updateUniqueVisits(Url url, HttpServletRequest request) {
+    private void updateUniqueVisits(Url url) {
         String ipAddress = HttpUtils.getRequestIp(request);
         boolean isExists = visitorDao.existsByUrlIdAndIp(url.getId(), ipAddress);
 

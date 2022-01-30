@@ -10,7 +10,6 @@ import com.urlshortener.model.Url;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @Service
@@ -20,11 +19,11 @@ public class UrlService {
     private final UrlMapper urlMapper;
     private final StatisticsService statisticsService;
 
-    public String getOriginalUrl(String shortUrl, HttpServletRequest request) {
+    public String getOriginalUrl(String shortUrl) {
         Url url = urlDao.getByShortUrl(shortUrl).orElseThrow(() -> new EntityNotFoundException(
                 String.format("Entity with url: %s was not found", shortUrl)));
 
-        statisticsService.updateCounters(url, request);
+        statisticsService.updateCounters(url);
 
         return url.getUrl();
     }
