@@ -1,15 +1,13 @@
 # Url shortener
 
-Сокращатель ссылок.
+Демо: [url.vlados.me](https://url.vlados.me)
 
-Демо: [url.vlados.me](http://url.vlados.me)
-
-Swagger: [url.vlados.me/swagger-ui/index.html](http://url.vlados.me/swagger-ui/index.html#/)
+Swagger: [url.vlados.me/swagger-ui/index.html](https://url.vlados.me/swagger-ui/index.html#/)
 
 Приложение создано с использованием:
 
 * Spring Boot
-* OpenAPI
+* Swagger
 * PostgreSQL
 * Docker
 
@@ -26,6 +24,9 @@ Swagger: [url.vlados.me/swagger-ui/index.html](http://url.vlados.me/swagger-ui/i
 | POST       | /api/v1/register           | Создание нового аккаунта                        |                                            |
 
 ## Сборка и запуск
+
+Необходимо указать следующие системные переменные:
+db_host, db_username, db_password, SECURITY_SECRET.
 
 Сборка и запуск приложения:
 
