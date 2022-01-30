@@ -4,6 +4,7 @@ import com.urlshortener.dao.UrlDao;
 import com.urlshortener.dao.VisitorDao;
 import com.urlshortener.model.Url;
 import com.urlshortener.model.Visitor;
+import com.urlshortener.util.HttpUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,7 @@ public class StatisticsService {
     }
 
     private void updateUniqueVisits(Url url, HttpServletRequest request) {
-        String ipAddress = request.getRemoteAddr();
+        String ipAddress = HttpUtils.getRequestIp(request);
         boolean isExists = visitorDao.existsByUrlIdAndIp(url.getId(), ipAddress);
 
         if (!isExists) {
