@@ -5,11 +5,6 @@ services:
     container_name: url_postgres
     image: postgres
     restart: always
-    network_mode: bridge
-    ports:
-      - "5433:5432"
-    expose:
-      - 5433
     environment:
       POSTGRES_DB: url_shortener
       POSTGRES_USER: postgres
@@ -27,15 +22,12 @@ services:
     container_name: url
     image: url:latest
     restart: always
-    network_mode: bridge
-    ports:
-      - "8081:8080"
     depends_on:
       - url_postgres
     links:
       - url_postgres
     environment:
-      db_host: $url_db_host
+      db_host: jdbc:postgresql://url_postgres:5432/
       db_username: postgres
       db_password: $db_password
       SECURITY_SECRET: $SECURITY_SECRET
@@ -43,3 +35,8 @@ services:
 volumes:
   postgres_data:
     driver: local
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
